@@ -463,4 +463,13 @@ mod tests {
 			WasmExecutor::new().call(ext, 8, &WASM_BINARY, "Core_execute_block", &b.encode()).unwrap();
 		})
 	}
+
+	#[test]
+	fn print_storage_ext() {
+		let storage_ext = Extrinsic::StorageChange(
+			b"noot".to_vec(),
+			Some(b"gossamer_is_cool".to_vec()),
+		);
+		println!("storage_ext {:?}", storage_ext.encode());
+	}
 }
