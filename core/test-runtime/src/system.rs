@@ -472,4 +472,32 @@ mod tests {
 		);
 		println!("storage_ext {:?}", storage_ext.encode());
 	}
+
+
+	#[test]
+	fn test_extrinsics() {
+		let transfer_ext = Transfer{
+					from: AccountKeyring::Alice.into(),
+					to: AccountKeyring::Charlie.into(),
+					amount: 69,
+					nonce: 1,
+		}.into_signed_tx();
+
+		println!("{:?}", transfer_ext.encode());
+
+		match transfer_ext {
+			Extrinsic::Transfer(transfer, signature) => {
+				println!("{:?}", signature);
+				println!("{:?}", transfer.from);
+				println!("{:?}", transfer.to);
+			},
+			_ => {},
+		};
+
+		let include_data_ext = Extrinsic::IncludeData(vec![111u8, 0, 0, 0, 0, 0, 0, 0]);
+		println!("{:?}", include_data_ext.encode());
+
+		let storage_change_ext = Extrinsic::StorageChange(vec![77u8, 1, 2, 3], Option::Some(vec![99u8]));
+		println!("{:?}", storage_change_ext.encode());
+	}
 }
