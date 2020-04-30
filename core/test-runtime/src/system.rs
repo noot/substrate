@@ -200,7 +200,7 @@ pub fn validate_transaction(utx: Extrinsic) -> TransactionValidity {
 		let mut deps = Vec::new();
 		deps.push(hash(&tx.from, tx.nonce - 1));
 		deps
-	} else {'
+	} else {
 		Vec::new()
 	};
 
