@@ -160,6 +160,28 @@ pub fn validate_transaction(utx: Extrinsic) -> TransactionValidity {
 		return InvalidTransaction::BadProof.into();
 	}
 
+	match utx {
+		Extrinsic::StorageChange(key, value) => {
+			return Ok(ValidTransaction {
+				priority: 1,
+				requires: vec![],
+				provides: vec![],
+				longevity: 1,
+				propagate: false,
+			});
+		},
+		Extrinsic::AuthoritiesChange(ids) => {
+			return Ok(ValidTransaction {
+				priority: 1<<63,
+				requires: vec![],
+				provides: vec![],
+				longevity: 1,
+				propagate: true,
+			});		
+		},
+		_ => {},
+	};
+	
 	let tx = utx.transfer();
 	let nonce_key = tx.from.to_keyed_vec(NONCE_OF);
 	let expected_nonce: u64 = storage::hashed::get_or(&blake2_256, &nonce_key, 0);
