@@ -90,7 +90,7 @@ pub fn polish_block(block: &mut Block) {
 }
 
 pub fn execute_block(mut block: Block) {
-	execute_block_with_state_root_handler(&mut block, Mode::Verify);
+	execute_block_with_state_root_handler(&mut block, Mode::Overwrite);
 }
 
 fn execute_block_with_state_root_handler(
