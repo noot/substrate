@@ -268,12 +268,20 @@ fn check_signature(utx: &Extrinsic) -> Result<(), ApplyError> {
 }
 
 fn execute_transaction_backend(utx: &Extrinsic) -> ApplyResult {
-	check_signature(utx)?;
 	match utx {
-		Extrinsic::Transfer(ref transfer, _) => execute_transfer_backend(transfer),
-		Extrinsic::AuthoritiesChange(ref new_auth) => execute_new_authorities_backend(new_auth),
+		Extrinsic::Transfer(ref transfer, _) => {
+			check_signature(utx)?;
+			execute_transfer_backend(transfer)
+		},
+		Extrinsic::AuthoritiesChange(ref new_auth) => {
+			check_signature(utx)?;
+			execute_new_authorities_backend(new_auth)
+		},
 		Extrinsic::IncludeData(_) => Ok(Ok(())),
-		Extrinsic::StorageChange(key, value) => execute_storage_change(key, value.as_ref().map(|v| &**v)),
+		Extrinsic::StorageChange(key, value) => {
+			check_signature(utx)?;
+			execute_storage_change(key, value.as_ref().map(|v| &**v))
+		},
 	}
 }
 
@@ -293,7 +301,7 @@ fn execute_transfer_backend(tx: &Transfer) -> ApplyResult {
 	let from_balance: u64 = storage::hashed::get_or(&blake2_256, &from_balance_key, 0);
 
 	// enact transfer
-	if !(tx.amount <= from_balance) {
+	if tx.amount > from_balance {
 		return Err(InvalidTransaction::Payment.into());
 	}
 	let to_balance_key = tx.to.to_keyed_vec(BALANCE_OF);
